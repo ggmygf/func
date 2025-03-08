@@ -1,3 +1,4 @@
+
 //import { WebSocket } from "jsr:@std/ws@0.218.2";
 //import { serve } from "https://deno.land/std@0.218.2/http/server.ts";
 
@@ -6,7 +7,7 @@ const p = "bestproxy.onecf.eu.org"; // Proxy IP (optional)
 const o = 1; /*WebSocket.OPEN*/ const c = 2; // WebSocket.CLOSING
 const ml = console.log; let chass = 11;
 
-
+/*
 async function h(r: Request) {
   if (r.headers.get("upgrade") !== "websocket") {return new Response("Expet...", { status: 426 });}
   const { socket: w, response: y } = Deno.upgradeWebSocket(r);          
@@ -14,7 +15,7 @@ async function h(r: Request) {
   const h = r.headers.get("sec-websocket-protocol") || "";  
   let v = { value: null as Deno.Conn | null }, g: ((k: Uint8Array) => void) | null = null, n = false;
 
-  try { w.onmessage = async(x)=>{      const b = x.data as Uint8Array;  ml("on_msg"); ml(b_(b, u)); 
+  try { w.onmessage = async(x)=>{      const b = x.data as Uint8Array;  ml("on_msg");
 
       if(n && g) {return g(b);}          if(v.value){await v.value.write(b); return;}    
       const { hasError: f, message: m, portRemote: q = 443, addressRemote: a, rawDataIndex: z, vlessVersion: t = new Uint8Array([0, 0]), isUDP: s } = b_(b, u);
@@ -23,10 +24,10 @@ async function h(r: Request) {
       if(s){if(q===53) {n=true;} else { throw new Error("UDP go 53 only!"); } }
       const r = new Uint8Array([t[0], 0]), C = b.slice(z);           if (n) { g = (await C_(w, r, l)).write; g(C); return; }
 
-      const D = async (A: string, B: number) => { ml(A); try{
+      const D = async (A: string, B: number) => {try{
                   const S = await Deno.connect({ hostname: A, port: B }); 
                   if(S){v.value = S; await S.write(C); return S; } 
-                };};
+                }};
       
       // t.close?? 
       const E = async () => {const T=await D(a, q); T.close(); F(T, w, r, null, l);};         const G = await D(p || a, q); F(G, w, r, E, l); 
@@ -43,7 +44,7 @@ async function h(r: Request) {
   //vlessheader
 function b_(b: Uint8Array, u: string) {         if (b.byteLength < 24) {return{f: true, m: "header too short"};}
   
-  const t = b.slice(0, 1), i = true/*stringify(b.slice(1, 17)) === u*/, 
+  const t = b.slice(0, 1), i = true, // stringify(b.slice(1, 17)) === u
         s = b.slice(17, 18)[0], 
         c = b.slice(18 + s, 19 + s)[0];
 
@@ -88,3 +89,50 @@ function k(w: WebSocket) { try { (w.readyState === o || w.readyState === c) && w
 function stringify(arr: Uint8Array): string {return Array.from(arr).map((byte) => String.fromCharCode(byte)).join("");}
 
 Deno.serve(h);
+*/
+
+
+
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+
+export const handler = serve(async (req) => {
+  try {
+    const conn = await Deno.connect({ hostname: "bing.com", port: 443 });
+
+    // Basic check if connection is established
+    if (conn) {
+      console.log("Connected to bing.com");
+
+      // Attempt to write a simple HTTP request to bing.com. You will likely get an error, as this is a tcp connection, not an https.
+      try{
+        await conn.write(new TextEncoder().encode("GET / HTTP/1.1\r\nHost: bing.com\r\n\r\n"));
+        //attempt to read the response.
+        const buf = new Uint8Array(1024);
+        const n = await conn.read(buf);
+
+        if (n !== null) {
+          const response = new TextDecoder().decode(buf.subarray(0, n));
+          console.log("Response from bing.com:", response);
+          return new Response(`Connected to bing.com. Response: ${response}`, { status: 200 });
+
+        } else {
+          console.log("No response from bing.com.");
+          return new Response("Connected to bing.com, but no response.", { status: 200 });
+        }
+      } catch (writeReadError) {
+          console.error("Error writing/reading from bing.com:", writeReadError);
+          return new Response(`Connected to bing.com, but error writing/reading. ${writeReadError}`, { status: 500 });
+      }
+
+      // Close the connection
+      conn.close();
+      return new Response("Connected to bing.com", { status: 200 });
+    } else {
+      console.error("Connection to bing.com failed.");
+      return new Response("Connection to bing.com failed.", { status: 500 });
+    }
+  } catch (error) {
+    console.error("Error connecting to bing.com:", error);
+    return new Response(`Error connecting to bing.com: ${error.message}`, { status: 500 });
+  }
+});
