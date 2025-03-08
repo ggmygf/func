@@ -1,12 +1,12 @@
 
 //import { WebSocket } from "jsr:@std/ws@0.218.2";
 //import { serve } from "https://deno.land/std@0.218.2/http/server.ts";
-
+/*
 const u = "6af3b37a-91a9-4773-8d76-1e81918448c3"; // User ID for authentication (required)
 const p = "bestproxy.onecf.eu.org"; // Proxy IP (optional)
-const o = 1; /*WebSocket.OPEN*/ const c = 2; // WebSocket.CLOSING
-const ml = console.log; let chass = 11;
-
+const o = 1;  const c = 2; const ml = console.log; let chass = 11;
+*/
+  
 /*
 async function h(r: Request) {
   if (r.headers.get("upgrade") !== "websocket") {return new Response("Expet...", { status: 426 });}
