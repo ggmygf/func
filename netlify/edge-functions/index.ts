@@ -26,7 +26,7 @@ async function h(r: Request) {
       const D = async (A: string, B: number) => { ml(A); try{
                   const S = await Deno.connect({ hostname: A, port: B }); 
                   if(S){v.value = S; await S.write(C); return S; } 
-                }};
+                };};
       
       // t.close?? 
       const E = async () => {const T=await D(a, q); T.close(); F(T, w, r, null, l);};         const G = await D(p || a, q); F(G, w, r, E, l); 
